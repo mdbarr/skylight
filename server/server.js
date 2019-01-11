@@ -46,6 +46,36 @@ function Server(skyfall) {
 
   /////////
 
+  skyfall.api.get('/api/pr/:user/assigned', function(req, res, next) {
+    skyfall.store.collections.pulls.find({
+      state: {
+        $ne: 'closed'
+      },
+      requested_reviewers: {
+        $elemMatch: {
+          login: req.params.user
+        }
+      }
+    }).toArray(function(error, results) {
+      res.send(200, results);
+      next();
+    });
+  });
+
+  skyfall.api.get('/api/pr/:user/opened', function(req, res, next) {
+    skyfall.store.collections.pulls.find({
+      state: {
+        $ne: 'closed'
+      },
+      'user.login': req.params.user
+    }).toArray(function(error, results) {
+      res.send(200, results);
+      next();
+    });
+  });
+
+  /////////
+
   self.boot = function(callback) {
     callback = skyfall.util.callback(callback);
 
